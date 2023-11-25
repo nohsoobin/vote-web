@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.8.0;
+pragma solidity ^0.8.19;
 
 contract Election {
     struct Candidate {
@@ -9,18 +9,14 @@ contract Election {
     }
 
     mapping(uint256 => Candidate) public candidates;
-
     mapping(address => bool) public voters;
-
     uint256 public candidatesCount;
 
-    // voted event
-    //event votedEvent(uint256 indexed _candidateId);
 
     constructor() public {
-        addCandidate("John Wick");
-        addCandidate("Browney Jr");
-        addCandidate("Helena Williams");
+        addCandidate("Sultan");
+        addCandidate("Jungmo");
+        addCandidate("Sunggyu");
     }
 
     function addCandidate(string memory _name) private {
@@ -28,20 +24,20 @@ contract Election {
         candidates[candidatesCount] = Candidate(candidatesCount, _name, 0);
     }
 
+    function addNewCandidate(string memory _name) public {
+        require(!voters[msg.sender], "Voter cannot add a new candidate after voting.");
+
+        candidatesCount++;
+        candidates[candidatesCount] = Candidate(candidatesCount, _name, 0);
+    }
+
     function vote(uint256 _candidateId) public {
-        // require that they haven't voted before
-        require(!voters[msg.sender]);
+        require(!voters[msg.sender], "You have already voted.");
 
-        // require a valid candidate
-        require(_candidateId > 0 && _candidateId <= candidatesCount);
+        require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate ID.");
 
-        // record that voter has voted
         voters[msg.sender] = true;
-
-        // update candidate vote Count
         candidates[_candidateId].voteCount++;
 
-        // trigger voted event
-        //emit votedEvent(_candidateId);
     }
 }
